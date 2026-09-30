@@ -1,0 +1,7 @@
+DirectoryIndex index.php
+# MMC ERP Control Center 1.7.1: konfiguracija i Plesk datoteke nisu dostupne preko weba.
+<IfModule mod_authz_core.c>
+<FilesMatch "^(config\.local\.php|config\.php|\.php-ini|\.php-version|\.htaccess\.off)$">
+Require all denied
+</FilesMatch>
+</IfModule>

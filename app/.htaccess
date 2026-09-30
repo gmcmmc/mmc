@@ -1,0 +1,8 @@
+# MMC ERP Control Center: ovaj direktorij se nikad ne poslužuje preko weba (samo PHP ga čita).
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order allow,deny
+Deny from all
+</IfModule>
