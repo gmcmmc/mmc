@@ -1,9 +1,9 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "theme": "MMC ERP Control Center",
-  "name": "MMC ERP Control Center 1.8.0 - profesionalni shell, prijava i odjava",
-  "description": "Nova stranica za prijavu (zaštita od pogađanja lozinke, CSRF), odjava uvijek vidljiva (sidebar i korisnički izbornik), istek sesije, mobilni izbornik, status nadogradnje po firmi povezan s Update Centrom i dinamički prikaz svih postojećih i novih firmi.",
-  "short_description": "Prijava/odjava, sigurnost sesije, status nadogradnji po firmi",
+  "name": "MMC ERP Control Center 1.9.0 - javni cjenik, konfigurator i upiti kupaca",
+  "description": "Javna stranica erp.mmc.ba/cjenik: paketi, detaljan opis svakog modula, konfigurator s cijenom uživo i slanje upita koji stiže u novu stranicu Upiti u Control Centru (podaci o firmi, konfiguracija, pitanja, ponuda iz upita). Uključen i partnerski dio za knjigovođe.",
+  "short_description": "Javni cjenik/konfigurator i upiti kupaca u Control Centru",
   "target_app": "control-center",
   "package_scope": "tenant"
 }

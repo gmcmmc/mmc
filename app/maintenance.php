@@ -36,7 +36,7 @@ function cc_foreign_dirs(): array { return ['public/icons', 'public/assets']; }
 function cc_protected_files(): array {
   return ['index.php', 'install.php', 'config.php', 'config.local.php', 'mmc-update.json', '.htaccess', '.htaccess.off', '.php-ini', '.php-version',
     'app/core.php', 'app/agent_client.php', 'app/update_api.php', 'app/maintenance.php', 'app/schema.sql', 'app/.htaccess',
-    'docs/README.txt', 'public/style.css', 'public/mmc-logo.png', 'public/mmc-erp-login-bg.png', 'public/mmc-erp-v104-hero.png',
+    'docs/README.txt', 'public/style.css', 'app/public_site.php', 'app/public_page.php', 'app/public_catalog.php', 'public/cjenik.css', 'public/cjenik.js', 'public/mmc-logo.png', 'public/mmc-erp-login-bg.png', 'public/mmc-erp-v104-hero.png',
     'public/mmc-erp-v112-clean-hero.png', 'public/mmc-erp-v112-fullscene.png', 'public/mmc-erp-v112-left-artwork.jpg'];
 }
 

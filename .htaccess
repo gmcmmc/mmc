@@ -5,3 +5,9 @@ DirectoryIndex index.php
 Require all denied
 </FilesMatch>
 </IfModule>
+
+# v1.9.0: javna stranica cjenika — erp.mmc.ba/cjenik (bez prijave)
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^cjenik/?$ index.php?page=cjenik [L,QSA,NC]
+</IfModule>

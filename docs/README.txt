@@ -1,3 +1,42 @@
+MMC ERP Control Center v1.9.0 — javni cjenik, konfigurator i upiti kupaca
+=========================================================================
+NOVO: javna stranica  https://erp.mmc.ba/cjenik  (bez prijave; ?page=cjenik radi uvijek kao rezervni link)
+- Paketi (START/BUSINESS/PRO) s cijenama mjesečno / 6 mj. / 12 mj., implementacijom i uključenom podrškom.
+- Svi moduli detaljno objašnjeni: čemu služi, šta dobijate, za koga je, primjer iz prakse, od čega ovisi
+  i u kojem je paketu uključen ili koliko košta kao dodatni modul. Tekstove uređuješ u app/public_catalog.php.
+- Konfigurator: djelatnost → paket → period plaćanja → dodatni moduli → vertikalni moduli (Servis, Moto DMS, Optika:
+  "cijena po dogovoru") → usluge po satu (procjena) → podaci o poslovanju → podaci firme i pitanja.
+  Cijena se prikazuje uživo (bez PDV-a, PDV, ukupno, prosjek mjesečno, ušteda). Modul koji traži viši paket
+  ne može se označiti. Na mobitelu je ukupna cijena u donjoj traci s detaljima.
+- Dio za knjigovođe: opis modula Centar knjigovođe, partnerski uslovi (provizija i bonus iz Cjenika), kalkulator zarade
+  i poseban upit.
+- CIJENE SE NE UPISUJU U KOD: čitaju se iz Cjenika u Control Centru (paketi, dodatni moduli, usluge). Promjena cijene u
+  Cjeniku odmah vrijedi na javnoj stranici. Iznos upita server uvijek iznova izračunava iz baze (iz preglednika se
+  ne prima nikakav iznos).
+
+UPITI U CONTROL CENTRU (novi izbornik "Upiti", broj novih upita uz izbornik i obavijest na Nadzornoj ploči):
+- Lista s filterom po statusu (Novi / U obradi / Ponuda poslana / Dobijeno / Izgubljeno / Spam) i pretragom.
+- Detalj: podaci o firmi i kontaktu (email i telefon su linkovi), pitanja kupca, podaci o poslovanju, cijela
+  konfiguracija s iznosima, interna bilješka, status, "Odgovori emailom".
+- "Kreiraj ponudu iz upita": pravi nacrt u Ponudama (stavke iz konfiguracije, podaci kupca, vrijedi 30 dana).
+- Obavijest emailom: svaki upit šalje email svim aktivnim administratorima (PHP mail()). Ako mail() na serveru ne radi,
+  upit se ipak spremi i vidi u Control Centru (u detalju piše "email obavijest nije poslana").
+  Opcije u config.local.php (nije dio paketa, dodaj ručno):  'notify_email' => 'a@mmc.ba,b@mmc.ba',
+  'app_url' => 'https://erp.mmc.ba'.
+- Tabela inquiries se sama kreira pri prvom otvaranju (baza se ne mijenja ručno).
+
+ZAŠTITA JAVNOG OBRASCA: potpisan token (mora proći 4 s do 12 h), skriveno polje za botove, najviše 5 upita po IP adresi
+na sat (storage/inquiry-throttle.json), validacija svih polja, izlaz se escape-a, saglasnost za obradu podataka.
+Stvarna IP adresa se čita i iza nginx proxyja (X-Forwarded-For) — vrijedi i za blokadu prijave iz 1.8.0.
+
+INSTALACIJA: raspakirati preko roota erp.mmc.ba (novo: app/public_site.php, app/public_page.php, app/public_catalog.php,
+public/cjenik.css, public/cjenik.js; mijenjaju se index.php, app/core.php, app/maintenance.php, public/style.css,
+.htaccess, config.php, mmc-update.json, docs/README.txt). config.local.php i storage/ se ne diraju.
+Adresa /cjenik radi preko .htaccess (mod_rewrite). Ako u Plesku nginx sam poslužuje stranicu, u
+Apache & nginx Settings › Additional nginx directives dodaj:
+    location = /cjenik { try_files $uri /index.php?page=cjenik; }
+Ako .htaccess na serveru nije bio od Control Centra, dodaj u njega:  RewriteEngine On  /  RewriteRule ^cjenik/?$ index.php?page=cjenik [L,QSA,NC]
+
 MMC ERP Control Center v1.8.0 — profesionalni shell, prijava i odjava
 =====================================================================
 PRIJAVA:

@@ -37,7 +37,14 @@ function role_label(string $r):string{return match(strtoupper($r)){'SUPERADMIN'=
 /* v1.8.0: zaštita prijave — nakon 5 neuspjelih pokušaja s iste IP adrese ili za isti email prijava je blokirana 15 min. */
 const CC_LOGIN_MAX_FAILS=5;const CC_LOGIN_WINDOW=900;
 function login_throttle_file():string{return __DIR__.'/../storage/login-throttle.json';}
-function login_throttle_keys(string $email):array{$ip=(string)($_SERVER['REMOTE_ADDR']??'');return ['ip:'.hash('sha256',$ip),'em:'.hash('sha256',strtolower(trim($email)))];}
+/* Stvarna IP adresa posjetitelja; iza lokalnog proxyja (nginx/Plesk) čita se X-Forwarded-For / X-Real-IP. */
+function client_ip():string{
+ $ip=(string)($_SERVER['REMOTE_ADDR']??'');
+ $public=fn(string $x)=>filter_var($x,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE)!==false;
+ if(!$public($ip)){foreach(['HTTP_X_FORWARDED_FOR','HTTP_X_REAL_IP'] as $h){foreach(explode(',',(string)($_SERVER[$h]??'')) as $c){$c=trim($c);if($public($c))return $c;}}}
+ return $ip;
+}
+function login_throttle_keys(string $email):array{$ip=client_ip();return ['ip:'.hash('sha256',$ip),'em:'.hash('sha256',strtolower(trim($email)))];}
 function login_throttle_load():array{$f=login_throttle_file();$d=is_file($f)?json_decode((string)@file_get_contents($f),true):[];$d=is_array($d)?$d:[];$now=time();return array_filter($d,fn($x)=>is_array($x)&&$now-(int)($x['t']??0)<CC_LOGIN_WINDOW);}
 function login_throttle_save(array $d):void{$dir=dirname(login_throttle_file());if(is_dir($dir)&&is_writable($dir))@file_put_contents(login_throttle_file(),json_encode($d),LOCK_EX);}
 /* Vraća broj sekundi do otključavanja (0 = prijava dozvoljena). */
