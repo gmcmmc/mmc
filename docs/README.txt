@@ -1,3 +1,35 @@
+MMC ERP Control Center v1.8.0 — profesionalni shell, prijava i odjava
+=====================================================================
+PRIJAVA:
+- Nova stranica za prijavu: čisti raspored (slika lijevo, forma desno; na mobitelu samo forma).
+  Uklonjena je pozadinska slika s "ugrađenom" lažnom formom preko koje se stvarna forma loše poravnavala,
+  kao i gumbi koji ništa nisu radili ("Zapamti me", "Prijava s Microsoftom", "SSO").
+- Prikaži/sakrij lozinku, upozorenje za Caps Lock, poruke nakon odjave i isteka sesije.
+- Sigurnost: CSRF token na prijavi, blokada 15 min nakon 5 neuspjelih pokušaja (po IP adresi i po emailu,
+  storage/login-throttle.json), audit LOGIN / LOGIN_FAILED / LOGOUT, automatski rehash lozinke.
+
+ODJAVA I SESIJA:
+- Odjava je uvijek vidljiva: u dnu sidebara (uz ime, email i ulogu) i u korisničkom izborniku gore desno.
+  Prije je link bio izvan ekrana (sidebar nije imao scroll), a na mobitelu potpuno skriven.
+- Odjava radi samo POST-om sa sigurnosnim tokenom (GET ?page=logout više ne odjavljuje).
+- Sesija istječe nakon 60 min neaktivnosti i najkasnije 12 h nakon prijave.
+
+POVEZANOST S FIRMAMA I CORE NADOGRADNJAMA:
+- Svaka kartica/redak firme prikazuje stanje nadogradnje iz Update Centra: "Dostupna X" (STABILNA, kompatibilna
+  s profilom/slugom/core_from firme), "Pilot X" ili "Ažurno". Paketi Control Centra se nikad ne nude firmama.
+- KPI "CORE" prikazuje najvišu instaliranu Core verziju i broj firmi koje čekaju nadogradnju
+  (prije: zadnji upisani red iz core_versions, što je mogao biti i paket Control Centra).
+- "Nadogradnje" s kartice firme otvara Update Center filtriran na pakete kompatibilne s tom firmom.
+- Uklonjen je fiksni gumb "+ MIKRO Retail"; nove firme se dodaju kroz "+ Nova firma" s profilom djelatnosti.
+- Slug firme se provjerava (mala slova, brojke, crtica) i mora biti jedinstven.
+- Statusi na bosanskom (Aktivna / Pauzirana / Održavanje), boja kartice prati status, datumi d.m.Y. H:i.
+- Popravljen izobličen (okrugli) badge statusa na karticama firmi.
+
+MOBITEL: sidebar postaje ladica (gumb ☰), odjava dostupna i u ladici i u gornjem izborniku.
+
+INSTALACIJA: raspakirati preko roota erp.mmc.ba (mijenjaju se index.php, app/core.php, public/style.css,
+config.php, mmc-update.json, docs/README.txt). config.local.php i storage/ se ne diraju. Baza se ne mijenja.
+
 MMC ERP Control Center v1.7.1 — čišćenje roota, čišćenje paketa i sigurnosne popravke
 =====================================================================================
 ZAŠTO: u root erp.mmc.ba su greškom raspakirani ERP paketi. Prepisani su config.php, public/style.css

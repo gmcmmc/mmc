@@ -1,0 +1,4 @@
+# Lokalna konfiguracija (lozinka baze) i runtime podaci — nikad u git.
+config.local.php
+storage/*
+!storage/.htaccess

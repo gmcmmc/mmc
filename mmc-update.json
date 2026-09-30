@@ -1,9 +1,9 @@
 {
-  "version": "1.7.1",
+  "version": "1.8.0",
   "theme": "MMC ERP Control Center",
-  "name": "MMC ERP Control Center 1.7.1 - čišćenje roota i paketa",
-  "description": "Uklanja ERP datoteke koje su greškom raspakirane u root erp.mmc.ba, vraća CC config.php/style.css, dodaje čišćenje starih update paketa, upozorenje na ERP datoteke u rootu, sigurnosne popravke i punu podršku za AutoDMS (moto).",
-  "short_description": "Samoizlječenje roota, čišćenje starih paketa, sigurnosne popravke",
+  "name": "MMC ERP Control Center 1.8.0 - profesionalni shell, prijava i odjava",
+  "description": "Nova stranica za prijavu (zaštita od pogađanja lozinke, CSRF), odjava uvijek vidljiva (sidebar i korisnički izbornik), istek sesije, mobilni izbornik, status nadogradnje po firmi povezan s Update Centrom i dinamički prikaz svih postojećih i novih firmi.",
+  "short_description": "Prijava/odjava, sigurnost sesije, status nadogradnji po firmi",
   "target_app": "control-center",
   "package_scope": "tenant"
 }

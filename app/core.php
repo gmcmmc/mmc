@@ -15,8 +15,35 @@ function ensure_install_lock():void{if(installed()&&!install_locked()&&is_dir(di
 function e(string $s):string{return htmlspecialchars($s,ENT_QUOTES,'UTF-8');}
 function start_session():void{if(session_status()!==PHP_SESSION_ACTIVE){session_name('mmc_erp_platform');$https=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off')||(($_SERVER['HTTP_X_FORWARDED_PROTO']??'')==='https');session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$https,'httponly'=>true,'samesite'=>'Lax']);session_start();}}
 function is_admin():bool{return in_array(strtoupper((string)(user()['role']??'')),['SUPERADMIN','ADMIN'],true);}
-function user():?array{start_session();return $_SESSION['user']??null;}
+/* v1.8.0: sesija istječe nakon neaktivnosti (60 min) i najkasnije nakon 12 h od prijave. */
+const CC_IDLE_TIMEOUT=3600;const CC_MAX_SESSION=43200;
+function user():?array{
+ start_session();$u=$_SESSION['user']??null;if(!$u)return null;$now=time();
+ $last=(int)($_SESSION['last_seen']??$now);$since=(int)($_SESSION['login_at']??$now);
+ if($now-$last>CC_IDLE_TIMEOUT||$now-$since>CC_MAX_SESSION){logout_session('expired');return null;}
+ $_SESSION['last_seen']=$now;return $u;
+}
 function require_login():void{if(!user()){header('Location: ?page=login');exit;}}
+function login_session(array $u):void{start_session();session_regenerate_id(true);$_SESSION=['user'=>['id'=>(int)$u['id'],'name'=>(string)$u['name'],'email'=>(string)$u['email'],'role'=>(string)$u['role']],'login_at'=>time(),'last_seen'=>time()];}
+/* Uništava sesiju; $notice ('logout'/'expired') se prenosi u novu, praznu sesiju za poruku na prijavi. */
+function logout_session(string $notice=''):void{
+ start_session();$_SESSION=[];
+ if(ini_get('session.use_cookies')){$cp=session_get_cookie_params();setcookie(session_name(),'',['expires'=>time()-42000,'path'=>$cp['path'],'domain'=>$cp['domain'],'secure'=>$cp['secure'],'httponly'=>$cp['httponly'],'samesite'=>$cp['samesite']??'Lax']);}
+ session_destroy();
+ if($notice!==''&&!headers_sent()){session_id(session_create_id());start_session();$_SESSION['auth_notice']=$notice;}
+}
+function user_initials(string $name):string{$p=preg_split('/\s+/u',trim($name))?:[];$i='';foreach(array_slice($p,0,2) as $w)$i.=mb_strtoupper(mb_substr($w,0,1));return $i!==''?$i:'A';}
+function role_label(string $r):string{return match(strtoupper($r)){'SUPERADMIN'=>'Glavni administrator','ADMIN'=>'Administrator',default=>ucfirst(strtolower($r))};}
+/* v1.8.0: zaštita prijave — nakon 5 neuspjelih pokušaja s iste IP adrese ili za isti email prijava je blokirana 15 min. */
+const CC_LOGIN_MAX_FAILS=5;const CC_LOGIN_WINDOW=900;
+function login_throttle_file():string{return __DIR__.'/../storage/login-throttle.json';}
+function login_throttle_keys(string $email):array{$ip=(string)($_SERVER['REMOTE_ADDR']??'');return ['ip:'.hash('sha256',$ip),'em:'.hash('sha256',strtolower(trim($email)))];}
+function login_throttle_load():array{$f=login_throttle_file();$d=is_file($f)?json_decode((string)@file_get_contents($f),true):[];$d=is_array($d)?$d:[];$now=time();return array_filter($d,fn($x)=>is_array($x)&&$now-(int)($x['t']??0)<CC_LOGIN_WINDOW);}
+function login_throttle_save(array $d):void{$dir=dirname(login_throttle_file());if(is_dir($dir)&&is_writable($dir))@file_put_contents(login_throttle_file(),json_encode($d),LOCK_EX);}
+/* Vraća broj sekundi do otključavanja (0 = prijava dozvoljena). */
+function login_locked_for(string $email):int{$d=login_throttle_load();$max=0;foreach(login_throttle_keys($email) as $k)if(($d[$k]['n']??0)>=CC_LOGIN_MAX_FAILS)$max=max($max,CC_LOGIN_WINDOW-(time()-(int)$d[$k]['t']));return max(0,$max);}
+function login_register_fail(string $email):void{$d=login_throttle_load();foreach(login_throttle_keys($email) as $k){$n=(int)($d[$k]['n']??0)+1;$d[$k]=['n'=>$n,'t'=>$n>=CC_LOGIN_MAX_FAILS?time():(int)($d[$k]['t']??time())];}login_throttle_save($d);}
+function login_clear_fails(string $email):void{$d=login_throttle_load();foreach(login_throttle_keys($email) as $k)unset($d[$k]);login_throttle_save($d);}
 function csrf():string{start_session();return $_SESSION['csrf']??=bin2hex(random_bytes(24));}
 function check_csrf():void{start_session();if(!hash_equals($_SESSION['csrf']??'',$_POST['csrf']??''))throw new RuntimeException('Neispravan sigurnosni token.');}
 function q(string $sql,array $p=[]):PDOStatement{$s=db()->prepare($sql);$s->execute($p);return $s;}
@@ -84,6 +111,28 @@ function package_target_ok(array $t,array $p):bool{
 }
 
 function badge(string $txt,string $kind='ok'):string{return '<span class="badge '.$kind.'">'.e($txt).'</span>';}
+/* v1.8.0: jedinstveni prikaz statusa firme i datuma kroz cijeli CC. */
+function tenant_statuses():array{return ['ACTIVE'=>'Aktivna','PAUSED'=>'Pauzirana','MAINTENANCE'=>'Održavanje'];}
+function tenant_status_badge(string $s):string{$s=strtoupper($s);return badge(tenant_statuses()[$s]??$s,$s==='ACTIVE'?'ok':'warn');}
+function tenant_stage_label(string $s):string{return match(strtoupper($s)){'ACTIVE'=>'PRODUKCIJSKA INSTANCA','PAUSED'=>'INSTANCA PAUZIRANA','MAINTENANCE'=>'INSTANCA U ODRŽAVANJU',default=>'INSTANCA'};}
+function fmt_dt(?string $dt,bool $time=true):string{if(!$dt)return '—';$ts=strtotime($dt);return $ts?date($time?'d.m.Y. H:i':'d.m.Y.',$ts):$dt;}
+/* v1.8.0: veza firmi i Core nadogradnji. Brojčani dio verzije (5.12.2-moto -> 5.12.2) se uspoređuje s version_compare. */
+function core_vnum(string $v):string{return preg_replace('/[^0-9.].*$/','',trim($v))?:'0';}
+function core_version_cmp(string $a,string $b):int{return version_compare(core_vnum($a),core_vnum($b))?:strcmp($a,$b);}
+/* Paketi (nearhivirani, kompatibilni s firmom) noviji od instalirane verzije; najnoviji prvi. */
+function tenant_update_candidates(array $t,bool $stableOnly=true):array{
+ static $rows=null;
+ if($rows===null){try{$rows=q('SELECT * FROM update_packages WHERE archived_at IS NULL ORDER BY id DESC')->fetchAll();}catch(Throwable $e){$rows=[];}}
+ $cur=(string)($t['installed_version']??'');
+ $out=array_values(array_filter($rows,fn($p)=>(!$stableOnly||strtoupper((string)($p['release_channel']??''))==='STABLE')&&package_target_ok($t,$p)&&($cur===''||version_compare(core_vnum((string)$p['version']),core_vnum($cur))>0)));
+ usort($out,fn($a,$b)=>core_version_cmp((string)$b['version'],(string)$a['version'])?:((int)$b['id']<=>(int)$a['id']));
+ return $out;
+}
+function tenant_update_state(array $t):array{
+ $stable=tenant_update_candidates($t,true);if($stable)return ['state'=>'available','label'=>'Dostupna '.$stable[0]['version'],'package'=>$stable[0]];
+ $pilot=tenant_update_candidates($t,false);if($pilot)return ['state'=>'pilot','label'=>'Pilot '.$pilot[0]['version'],'package'=>$pilot[0]];
+ return ['state'=>'current','label'=>trim((string)($t['installed_version']??''))!==''?'Ažurno':'Verzija nepoznata','package'=>null];
+}
 
 require_once __DIR__.'/agent_client.php';
 
