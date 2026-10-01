@@ -179,6 +179,9 @@ body.pc{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,"Seg
 .pc-sum .pc-hint{color:#a9c4da}
 .pc-sum-cta{width:100%;margin-top:18px}
 .pc-sumbar{display:none}
+.pc-sum-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pc-sum-x{display:none;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:26px;line-height:1;cursor:pointer}
+.pc-backdrop{display:none}
 
 /* ---- knjigovođe ---- */
 .pc-acc{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
@@ -219,6 +222,10 @@ body.pc{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,"Seg
   .pc-sum.open{display:block;position:fixed;left:0;right:0;bottom:62px;z-index:59;max-height:68vh;overflow:auto;padding:0 10px}
   .pc-sum.open .pc-sum-in{border-radius:16px 16px 0 0;box-shadow:0 -14px 40px rgba(0,0,0,.35)}
   .pc-sum-cta{display:none}
+  .pc-sum-x{display:grid;place-items:center}
+  .pc-backdrop{display:block;position:fixed;inset:0;z-index:58;background:rgba(3,14,26,.55)}
+  .pc-backdrop[hidden]{display:none}
+  body.pc-sheet-open{overflow:hidden}
   .pc-sumbar-act{display:flex;gap:8px;align-items:center}
   .pc-acc{grid-template-columns:minmax(0,1fr)}
   .pc-nav{display:none}

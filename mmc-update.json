@@ -1,9 +1,9 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.1",
   "theme": "MMC ERP Control Center",
-  "name": "MMC ERP Control Center 1.9.0 - javni cjenik, konfigurator i upiti kupaca",
-  "description": "Javna stranica erp.mmc.ba/cjenik: paketi, detaljan opis svakog modula, konfigurator s cijenom uživo i slanje upita koji stiže u novu stranicu Upiti u Control Centru (podaci o firmi, konfiguracija, pitanja, ponuda iz upita). Uključen i partnerski dio za knjigovođe.",
-  "short_description": "Javni cjenik/konfigurator i upiti kupaca u Control Centru",
+  "name": "MMC ERP Control Center 1.9.1 - popravak mobilnog konfiguratora i sigurnosno čišćenje",
+  "description": "Popravlja panel konfiguracije na mobitelu (dugme za zatvaranje, zatvaranje pozadinom i automatski), \"Nazad\" više ne prolazi kroz sidra stranice. Uklanja iz paketa slike sa upisanim emailom, podatke klijenta iz koda i zabranjuje web pristup docs/ i mmc-update.json.",
+  "short_description": "Mobilni popravak i sigurnosno čišćenje",
   "target_app": "control-center",
   "package_scope": "tenant"
 }

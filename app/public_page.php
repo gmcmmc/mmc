@@ -182,9 +182,10 @@ function pub_render(array $d, array $errors, ?string $done): void {
       </fieldset>
     </div>
 
-    <aside class="pc-sum" id="pcSum" aria-live="polite"><div class="pc-sum-in"><h3>Vaša konfiguracija</h3><div id="sumBody"><p class="pc-hint">Uključite JavaScript za prikaz cijene uživo. Upit možete poslati i bez toga — ukupnu cijenu izračunavamo mi.</p></div>
+    <aside class="pc-sum" id="pcSum" aria-live="polite"><div class="pc-sum-in"><div class="pc-sum-head"><h3>Vaša konfiguracija</h3><button type="button" class="pc-sum-x" id="sumClose" aria-label="Zatvori pregled konfiguracije">&times;</button></div><div id="sumBody"><p class="pc-hint">Uključite JavaScript za prikaz cijene uživo. Upit možete poslati i bez toga — ukupnu cijenu izračunavamo mi.</p></div>
       <a class="pc-btn pc-btn-primary pc-sum-cta" href="#podaci">Nastavi na podatke <?= pub_icon('arrow') ?></a></div></aside>
   </form>
+  <div class="pc-backdrop" id="pcBackdrop" hidden></div>
   <div class="pc-sumbar" id="sumBar" hidden><div><small>Ukupno bez PDV-a</small><b id="sumBarTotal">—</b></div><div class="pc-sumbar-act"><button type="button" class="pc-btn pc-btn-sm" id="sumToggle" aria-expanded="false" aria-controls="pcSum">Detalji</button><a class="pc-btn pc-btn-primary pc-btn-sm" href="#podaci">Pošalji upit</a></div></div>
 </div></section>
 

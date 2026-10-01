@@ -195,7 +195,6 @@ if($page==='tenant'){
  $id=(int)($_GET['id']??0);
  $t=$id?q('SELECT * FROM tenants WHERE id=?',[$id])->fetch():null;
  $preset=$_GET['preset']??'';
- if(!$id&&$preset==='mikro')$t=['name'=>'MIKRO d.o.o. za promet i usluge','slug'=>'mikro','profile'=>'retail','industry'=>'Trgovina mješovite robe','base_url'=>'https://mikro.mmc.ba','db_name'=>'mikro_','db_user'=>'mikro_erp','fiscal_driver'=>'TRING','jib'=>'4254017430005','pdv'=>'254017430005','address'=>'J.B. Jelačića br. 55','city'=>'Donja Mahala','postal_code'=>'76274','country'=>'Bosna i Hercegovina','installed_version'=>'5.11.23-retail.3','target_version'=>'5.11.23-retail.3','status'=>'ACTIVE','agent_url'=>'https://mikro.mmc.ba/mmc-agent.php'];
  $profile=$t?tenant_app_type($t):'retail';
  $mods=$id?tenant_modules($id):tenant_profile_modules($profile);
  layout_top($t?'Postavke firme':'Nova firma');

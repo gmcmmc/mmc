@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   $pdo=new PDO("mysql:host=$h;port=$port;dbname=$name;charset=utf8mb4",$du,$dp,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
   $sql=file_get_contents(__DIR__.'/app/schema.sql');foreach(array_filter(array_map('trim',preg_split('/;\s*(?:\r?\n|$)/',$sql))) as $s)$pdo->exec($s);
   $hash=password_hash((string)$_POST['admin_pass'],PASSWORD_DEFAULT);$st=$pdo->prepare('INSERT INTO users(name,email,password_hash,role,active,created_at) VALUES(?,?,?,?,1,NOW())');$st->execute([trim($_POST['admin_name']),trim($_POST['admin_email']),$hash,'SUPERADMIN']);
-  $tenants=[['AQMC','aqmc','Moto / trgovina i servis','https://autodms.m-m-c.ba','5.11.14','TRING','4254182710004','254182710004'],['Optika Isić','optika-isic','Optika','https://optika.mmc.ba','5.11.14','TRING','4354082820001','354082820001']];
+  $tenants=[['AQMC','aqmc','Moto / trgovina i servis','https://autodms.m-m-c.ba','5.11.14','TRING','',''],['Optika Isić','optika-isic','Optika','https://optika.mmc.ba','5.11.14','TRING','','']];
   $ti=$pdo->prepare('INSERT INTO tenants(name,slug,industry,base_url,installed_version,target_version,fiscal_driver,jib,pdv,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,"ACTIVE",NOW(),NOW())');
   $mi=$pdo->prepare('INSERT INTO tenant_modules(tenant_id,module_key,enabled) VALUES(?,?,1)');
   foreach($tenants as $t){$ti->execute([$t[0],$t[1],$t[2],$t[3],$t[4],$t[4],$t[5],$t[6],$t[7]]);$id=(int)$pdo->lastInsertId();$mods=['core','partners','inventory','purchasing','sales','pos','cash','finance','vat','uio','accountant'];if($t[1]==='aqmc')$mods=array_merge($mods,['dms','service']);else $mods[]='optics';foreach($mods as $m)$mi->execute([$id,$m]);}

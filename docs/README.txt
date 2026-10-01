@@ -1,3 +1,15 @@
+MMC ERP Control Center v1.9.1 — popravak mobilnog konfiguratora i sigurnosno čišćenje
+=====================================================================================
+- Mobitel: panel "Vaša konfiguracija" se sada zatvara dugmetom ×, dodirom na tamnu pozadinu, tipkom Esc, a zatvara se i
+  sam kad se pojavi obrazac s podacima. Prije toga je ostajao otvoren bez načina za zatvaranje.
+- Klik na sidra unutar stranice (Paketi, Moduli, Saznaj više...) više ne dodaje stavke u historiju preglednika, pa
+  dugme "Nazad" vraća na prethodnu stranicu.
+- Iz paketa su uklonjene slike mmc-erp-login-bg.png i mmc-erp-v104-hero.png (imale su upisan email administratora),
+  podaci klijenta (JIB/PDV/adresa) iz install.php i prečice "MIKRO" te .php-ini (putanja servera) iz izvornog koda.
+  NA SERVERU OBRIŠI: public/mmc-erp-login-bg.png i public/mmc-erp-v104-hero.png (raspakiranje ZIP-a ih ne briše).
+- Web pristup je zabranjen za docs/, mmc-update.json, *.sql, *.log, *.bak, *.zip; isključeno listanje direktorija;
+  dodana zaglavlja X-Content-Type-Options i Permissions-Policy.
+
 MMC ERP Control Center v1.9.0 — javni cjenik, konfigurator i upiti kupaca
 =========================================================================
 NOVO: javna stranica  https://erp.mmc.ba/cjenik  (bez prijave; ?page=cjenik radi uvijek kao rezervni link)

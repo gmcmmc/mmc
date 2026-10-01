@@ -1,7 +1,8 @@
 DirectoryIndex index.php
+Options -Indexes
 # MMC ERP Control Center 1.7.1: konfiguracija i Plesk datoteke nisu dostupne preko weba.
 <IfModule mod_authz_core.c>
-<FilesMatch "^(config\.local\.php|config\.php|\.php-ini|\.php-version|\.htaccess\.off)$">
+<FilesMatch "^(config\.local\.php|config\.php|mmc-update\.json|install\.php\.bak|\.php-ini|\.php-version|\.htaccess\.off|.*\.(sql|log|bak|zip))$">
 Require all denied
 </FilesMatch>
 </IfModule>
@@ -10,4 +11,10 @@ Require all denied
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule ^cjenik/?$ index.php?page=cjenik [L,QSA,NC]
+</IfModule>
+
+# v1.9.1: osnovna zaglavlja sigurnosti (HSTS uključi u Plesku: Hosting Settings / SSL/TLS)
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>

@@ -19,6 +19,14 @@
   function round2(n) { return Math.round(n * 100) / 100; }
   function scrollToEl(el) { if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
 
+  /* ---------- sidra unutar stranice: ne dodaju stavke u historiju, pa "Nazad" radi kako treba ---------- */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a || a.getAttribute('href').length < 2) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1)); if (!t) return;
+    e.preventDefault(); document.dispatchEvent(new Event('pc-close-sheet')); if (t.tagName === 'DETAILS') t.open = true;
+    scrollToEl(t); if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+  });
+
   /* ---------- moduli: otvaranje/zatvaranje ---------- */
   function openMod(k) { var d = document.getElementById('mod-' + k); if (d) d.open = true; }
   $$('[data-open]').forEach(function (a) { a.addEventListener('click', function () { openMod(a.getAttribute('data-open')); }); });
@@ -146,15 +154,23 @@
       var i = vertInput(b.getAttribute('data-add-vertical')); if (i && !i.disabled) { i.checked = true; i.dispatchEvent(new Event('change', { bubbles: true })); }
       scrollToEl(document.getElementById('konfigurator')); }); });
 
-    /* mobilna traka: ukupno + detalji konfiguracije u donjem panelu */
-    var sumToggle = $('#sumToggle'), sumPanel = $('#pcSum');
-    function sheet(open) { if (!sumPanel || !sumToggle) return; sumPanel.classList.toggle('open', open); sumToggle.setAttribute('aria-expanded', open); sumToggle.textContent = open ? 'Sakrij' : 'Detalji'; }
+    /* mobilna traka: ukupno + detalji konfiguracije u donjem panelu (zatvara se dugmetom, pozadinom ili tipkom Esc) */
+    var sumToggle = $('#sumToggle'), sumPanel = $('#pcSum'), backdrop = $('#pcBackdrop'), sumClose = $('#sumClose');
+    function sheet(open) {
+      if (!sumPanel) return;
+      sumPanel.classList.toggle('open', open);
+      if (backdrop) backdrop.hidden = !open;
+      document.body.classList.toggle('pc-sheet-open', open);
+      if (sumToggle) { sumToggle.setAttribute('aria-expanded', open); sumToggle.textContent = open ? 'Zatvori' : 'Detalji'; }
+    }
     if (sumToggle) sumToggle.addEventListener('click', function () { sheet(!sumPanel.classList.contains('open')); });
-    $$('a[href="#podaci"]').forEach(function (a) { a.addEventListener('click', function () { sheet(false); }); });
+    document.addEventListener('pc-close-sheet', function () { sheet(false); });
+    if (sumClose) sumClose.addEventListener('click', function () { sheet(false); });
+    if (backdrop) backdrop.addEventListener('click', function () { sheet(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sheet(false); });
-    /* mobilna traka s ukupnom cijenom */
+    window.addEventListener('resize', function () { if (window.innerWidth > 1000) sheet(false); });
     if ('IntersectionObserver' in window && sumBar) {
-      var inCfg = false, inData = false, barUpd = function () { sumBar.hidden = !(inCfg && !inData); };
+      var inCfg = false, inData = false, barUpd = function () { var show = inCfg && !inData; sumBar.hidden = !show; if (!show) sheet(false); };
       new IntersectionObserver(function (en) { inCfg = en[0].isIntersecting; barUpd(); }, { threshold: 0.05 }).observe(document.getElementById('konfigurator'));
       new IntersectionObserver(function (en) { inData = en[0].isIntersecting; barUpd(); }, { threshold: 0.2 }).observe(document.getElementById('podaci'));
     }

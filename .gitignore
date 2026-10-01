@@ -2,3 +2,4 @@
 config.local.php
 storage/*
 !storage/.htaccess
+.php-ini
